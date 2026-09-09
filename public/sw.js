@@ -1,0 +1,4 @@
+const CACHE='vocaquest-assets-v3-purple';
+self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(['/offline.html','/icon-192.png','/art/unit-worlds.png','/art/worker-sprites.png'])));self.skipWaiting()});
+self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim()});
+self.addEventListener('fetch',event=>{const u=new URL(event.request.url);if(u.origin!==self.location.origin||event.request.method!=='GET'||u.pathname.startsWith('/api/')||u.pathname.includes('chatgpt')||u.pathname==='/callback')return;if(event.request.mode==='navigate'){event.respondWith(fetch(event.request).catch(()=>caches.match('/offline.html')))}else if(['/art/unit-worlds.png','/art/worker-sprites.png','/icon-192.png'].includes(u.pathname)){event.respondWith(caches.match(event.request).then(hit=>hit||fetch(event.request)))}});
